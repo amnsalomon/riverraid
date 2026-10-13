@@ -1,0 +1,554 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#161616">
+<meta name="description" content="River Raid no navegador. Recriação do clássico Atari 2600 com teclado, controles por toque, som e dois jogadores.">
+<title>River Raid — Atari 2600</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23303bb7'/%3E%3Cpath fill='%23e8d64a' d='M14 4h4v8h4v4h4v4H18v4h4v4H10v-4h4v-4H6v-4h4v-4h4z'/%3E%3C/svg%3E">
+<style>
+:root{color-scheme:dark;--gold:#e1ca83;--ink:#161616;--muted:#a09b91;--line:#48443b;--button:#272724;font-family:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace}
+*{box-sizing:border-box}body{margin:0;background:var(--ink);color:#e8e3d5;min-height:100svh;padding:22px 18px 18px}button,select{font:inherit}button{cursor:pointer}button:disabled{cursor:default;opacity:.4}button:focus-visible,select:focus-visible,canvas:focus-visible,a:focus-visible{outline:2px solid var(--gold);outline-offset:4px}[hidden]{display:none!important}
+.page{max-width:900px;margin:0 auto}.masthead{display:flex;align-items:center;justify-content:space-between;gap:20px;max-width:760px;margin:0 auto 15px}.brand h1{font-size:27px;font-weight:900;letter-spacing:3px;line-height:1;margin:0;color:var(--gold)}.brand p{color:var(--muted);font-size:10px;letter-spacing:2px;margin:9px 0 0}.record{text-align:right;font-size:9px;letter-spacing:2px;color:var(--muted)}.record strong{display:block;font-size:20px;color:var(--gold);letter-spacing:3px;margin-top:5px}
+.console{display:flex;flex-direction:column;align-items:center;margin:0 auto;max-width:800px;background:var(--ink);padding:0 12px}.screen-frame{width:min(100%,calc((100svh - 260px)*1.33333),736px);min-width:260px;padding:10px 12px 12px;border:1px solid #3a3934;border-radius:10px;background:#090909;box-shadow:0 12px 30px #0005,0 1px 0 #555 inset}.screen-wrap{position:relative;width:100%;aspect-ratio:4/3;background:#000;overflow:hidden;border:2px solid #20201d}canvas{width:100%;height:100%;display:block;image-rendering:pixelated;image-rendering:crisp-edges;outline:none!important;touch-action:none}.screen-caption{display:flex;justify-content:space-between;font-size:8px;letter-spacing:1.5px;padding-top:10px;color:#9c968b}.power{color:#be8155}.power:before{content:"";display:inline-block;width:5px;height:5px;margin-right:6px;border-radius:50%;background:#d76735}.overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:#0a0a16cb;padding:24px;z-index:2}.overlay h2{color:#e8d64a;font-size:clamp(21px,5vw,38px);letter-spacing:2px}.overlay p{line-height:1.7;font-size:12px;max-width:400px}.overlay button{background:var(--gold);border:0;color:#191919;font-weight:bold;padding:14px 22px;margin-top:14px}
+.status{height:30px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:10px;letter-spacing:.5px;color:var(--gold);margin:6px 0 3px}.switches{display:flex;align-items:center;justify-content:center;gap:7px;flex-wrap:wrap;width:100%}.switches button,.switches select{min-height:35px;border:1px solid var(--line);border-radius:3px;background:var(--button);color:#d4cebe;padding:8px 11px;font-size:10px;letter-spacing:.3px}.switches button:hover:not(:disabled){background:#39382f}.switches .primary{color:#181818;background:var(--gold);border-color:var(--gold);font-weight:800}.switches .primary:hover{background:#ecdbab!important}.options{display:flex;gap:17px;justify-content:center;flex-wrap:wrap;margin:13px 0 6px;color:var(--muted);font-size:10px}.options label{display:flex;align-items:center;gap:7px}.options select{color:#d9d3c4;background:#222;border:1px solid var(--line);border-radius:3px;font-size:10px;padding:6px 7px}.options select:disabled{opacity:.65}.help-button{color:var(--muted);background:none;border:0;text-decoration:underline;text-underline-offset:3px;font-size:10px;min-height:30px}.instructions{font-size:10px;color:var(--muted);text-align:center;line-height:1.9;margin:8px auto 0}.instructions kbd{color:#dcd6c7}.credits{max-width:740px;text-align:center;color:#74736c;font-size:9px;line-height:1.8;margin:16px auto 0}.credits a{color:#a39b86;text-decoration:none}.touch-controls{display:none;align-items:center;justify-content:space-between;width:min(100%,340px);padding:4px 13px 0;user-select:none;touch-action:none;-webkit-user-select:none}.dpad{display:grid;grid-template:repeat(3,34px)/repeat(3,38px);gap:3px}.touch-controls button{touch-action:none;-webkit-user-select:none;user-select:none;color:#e5dec9;background:#34332d;border:1px solid #69614f;border-radius:4px;font-size:19px;box-shadow:0 3px 0 #090909}.touch-controls button.held{background:#74663e;transform:translateY(2px);box-shadow:none}.up{grid-area:1/2}.left{grid-area:2/1}.right{grid-area:2/3}.down{grid-area:3/2}.dpad:after{content:"+";grid-area:2/2;display:grid;place-items:center;color:#49473c}.touch-controls .fire{width:76px;height:76px;border-radius:50%;background:#a23625;border:3px solid #d05c41;box-shadow:0 5px 0 #4b1b16;font-size:13px;font-weight:bold;letter-spacing:1px}.touch-controls .fire.held{background:#d4563f}.touch-caption{text-align:center;color:var(--muted);font-size:8px;margin:6px 0 0}
+.console:fullscreen{max-width:none;width:100%;height:100%;padding:12px;justify-content:center}.console:fullscreen .screen-frame{width:min(calc((100dvh - 140px)*1.33333),100%,1200px)}.console:fullscreen .options{display:none}.console:fullscreen .status{margin-top:0}.console:fullscreen .screen-caption{display:none}.console:fullscreen .touch-controls{display:none}
+dialog{max-width:530px;width:calc(100% - 34px);border:1px solid #74633b;background:#20201d;color:#e0d9c5;padding:26px;border-radius:6px;box-shadow:0 20px 60px #0008;font-size:12px;line-height:1.7}dialog::backdrop{background:#000b}dialog h2{font-size:20px;color:var(--gold);margin-top:0}dialog table{width:100%;border-collapse:collapse;margin:16px 0}dialog td{border-bottom:1px solid #464235;padding:6px 0}dialog td:first-child{color:var(--gold);padding-right:20px}dialog button{border:1px solid var(--gold);padding:10px 20px;background:var(--gold);color:#222;font-weight:bold}dialog .note{color:#aaa392;font-size:10px}.sr-only{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+@media(pointer:coarse){.touch-controls{display:flex}.screen-frame{width:min(100%,calc((100svh - 350px)*1.33333),700px)}.instructions{display:none}.console:fullscreen .touch-controls{display:flex;position:absolute;bottom:14px;width:100%;max-width:none;left:0;padding:0 24px;pointer-events:none}.console:fullscreen .touch-controls button{pointer-events:auto}.console:fullscreen .switches{position:relative;z-index:3;width:50%}.console:fullscreen .screen-frame{width:min(calc((100dvh - 120px)*1.33333),100%,1000px)}}
+@media(max-width:600px){body{padding:14px 8px}.masthead{margin-bottom:12px;padding:0 8px}.brand h1{font-size:21px;letter-spacing:2px}.brand p{font-size:8px;letter-spacing:1.3px}.record strong{font-size:16px}.record{font-size:8px}.console{padding:0}.screen-frame{border-radius:6px;padding:5px 5px 8px;min-width:0}.screen-caption{font-size:7px;padding-top:6px}.switches{gap:5px}.switches button{font-size:9px;padding:7px 8px;min-height:34px}.options{gap:8px;margin-top:10px}.options label,.options select{font-size:9px}.status{font-size:9px;height:30px;margin-top:4px}.credits{font-size:8px;margin-top:12px}.touch-controls{padding-top:0}.touch-caption{display:none}}
+@media(max-height:520px) and (pointer:coarse){body{padding:8px}.masthead,.credits,.options,.instructions{display:none}.console{max-width:none}.screen-frame{width:calc((100svh - 92px)*1.33333)}.screen-caption{display:none}.status{height:20px;font-size:8px;margin:0}.touch-controls{position:fixed;left:0;bottom:35px;max-width:none;width:100%;padding:0 12px;pointer-events:none}.touch-controls button{pointer-events:auto}.switches{width:55%;z-index:3}.switches button{padding:6px;font-size:8px;min-height:27px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="masthead">
+    <div class="brand"><h1>RIVER RAID</h1><p>ATARI 2600 · 1982</p></div>
+    <div class="record">SEU RECORDE<strong id="record">000000</strong></div>
+  </header>
+  <main class="console" id="console" aria-label="River Raid">
+    <div class="screen-frame">
+      <div class="screen-wrap">
+        <canvas id="screen" width="160" height="210" tabindex="0" role="img" aria-label="River Raid. Pilote com as setas, atire com espaço. O painel inferior mostra a pontuação, os aviões de reserva e o combustível." aria-describedby="status">Seu navegador precisa oferecer suporte a Canvas para jogar.</canvas>
+        <div class="overlay" id="overlay" hidden><h2 id="overlayTitle">PAUSADO</h2><p id="overlayText"></p><button id="continue">CONTINUAR</button></div>
+      </div>
+      <div class="screen-caption"><span class="power">POWER</span><span id="turn">1 JOGADOR</span><span>VIDEO COMPUTER SYSTEM</span></div>
+    </div>
+    <p id="status" class="status">ENTER OU INICIAR PARA JOGAR</p>
+    <div class="switches" aria-label="Controles do jogo">
+      <button id="reset" class="primary" title="Enter: iniciar ou reiniciar">INICIAR</button>
+      <button id="pause" title="P: pausar ou continuar" disabled>PAUSAR</button>
+      <button id="sound" title="M: ativar ou desativar o som" aria-pressed="true">SOM: ON</button>
+      <button id="fullscreen" title="F: tela cheia">TELA CHEIA</button>
+    </div>
+    <div class="touch-controls" aria-label="Controles por toque">
+      <div><div class="dpad"><button class="up" data-control="up" aria-label="Acelerar">▲</button><button class="left" data-control="left" aria-label="Voar para a esquerda">◀</button><button class="right" data-control="right" aria-label="Voar para a direita">▶</button><button class="down" data-control="down" aria-label="Desacelerar">▼</button></div><p class="touch-caption">DIREÇÃO / VELOCIDADE</p></div>
+      <div><button class="fire" data-control="fire" aria-label="Atirar. Segure para disparar continuamente.">TIRO</button><p class="touch-caption">SEGURE PARA ATIRAR</p></div>
+    </div>
+    <div class="options">
+      <label>SELECT <select id="players" aria-label="Número de jogadores"><option value="1">1 JOGADOR</option><option value="2">2 JOGADORES</option></select></label>
+      <label>DIFFICULTY <select id="difficulty" aria-label="Dificuldade"><option value="b">B · TIRO DIRECIONÁVEL</option><option value="a">A · TIRO RETO</option></select></label>
+      <button class="help-button" id="help">COMO JOGAR</button>
+    </div>
+  </main>
+  <p class="instructions"><kbd>← →</kbd> Pilotar &nbsp; <kbd>↑ ↓</kbd> Velocidade &nbsp; <kbd>ESPAÇO</kbd> Atirar &nbsp; <kbd>P</kbd> Pausar<br>Sobrevoe os depósitos FUEL para reabastecer. Destrua as pontes para avançar.</p>
+  <footer class="credits">Recriação independente para navegador. Jogo original: Carol Shaw / Activision, 1982.<br><a href="https://github.com/amnsalomon/riverraid" target="_blank" rel="noopener noreferrer">CÓDIGO-FONTE NO GITHUB</a></footer>
+</div>
+<dialog id="helpDialog" aria-labelledby="helpTitle">
+  <h2 id="helpTitle">COMO JOGAR</h2>
+  <p>Voe pelo rio, destrua os obstáculos e cuide do combustível. Você começa com um avião em voo e três de reserva.</p>
+  <table><tbody>
+    <tr><td>← → ou A / D</td><td>Pilotar para os lados</td></tr><tr><td>↑ ↓ ou W / S</td><td>Acelerar / desacelerar</td></tr>
+    <tr><td>Espaço ou Z</td><td>Atirar; segure para repetir</td></tr><tr><td>P / Esc</td><td>Pausar / continuar</td></tr>
+    <tr><td>Enter</td><td>Iniciar uma nova partida</td></tr><tr><td>M / F</td><td>Som / tela cheia</td></tr>
+  </tbody></table>
+  <p><strong>FUEL:</strong> sobrevoe o depósito para abastecer. Quanto mais devagar, mais combustível você recebe. Atirar no depósito o destrói.</p>
+  <p><strong>Pontos:</strong> navio 30 · helicóptero 60 · combustível 80 · jato 100 · ponte 500. A cada 10.000 pontos, um avião de reserva extra, até nove.</p>
+  <p><strong>Dificuldade B:</strong> o míssil acompanha seu movimento lateral. <strong>A:</strong> o míssil segue em linha reta.</p>
+  <p><strong>Dois jogadores:</strong> alternam a cada avião perdido, usando o mesmo teclado. No celular, use o direcional e o botão TIRO. Controles USB/Bluetooth compatíveis com o navegador também podem ser usados: direcional, botão principal e Start.</p>
+  <p class="note">O recorde fica salvo neste navegador, separado por dificuldade. O jogo pausa ao trocar de aba. O som é ativado após uma interação.</p>
+  <button id="closeHelp">ENTENDI</button>
+</dialog>
+<div id="announcement" class="sr-only" role="status" aria-live="polite"></div>
+<noscript><p style="text-align:center">Ative o JavaScript no navegador para jogar.</p></noscript>
+<script id="engine">
+/* Independent River Raid recreation. Original game design: Carol Shaw, 1982. */
+(() => {
+  'use strict';
+  const W=160, H=210, PLAY=166, PY=140, SECTOR=720;
+  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+  function noise(n,seed=1982) {
+    let x=(Math.imul(n|0,374761393)+Math.imul(seed|0,668265263))|0;
+    x=Math.imul(x^(x>>>13),1274126177);
+    return ((x^(x>>>16))>>>0)/4294967296;
+  }
+  const ROUTES=[
+    [[0,36,124],[90,36,124],[140,24,136],[240,24,136],[310,40,120],[390,40,120],[460,20,140],[550,20,140],[620,52,108],[720,52,108]],
+    [[0,52,108],[60,40,120],[130,20,140],[400,20,140],[460,40,120],[520,28,112],[575,48,100],[650,52,108],[720,52,108]],
+    [[0,52,108],[65,60,116],[130,36,140],[220,20,132],[280,20,108],[370,28,112],[430,44,140],[520,20,140],[600,52,108],[720,52,108]],
+    [[0,52,108],[60,36,124],[150,12,148],[410,12,148],[490,36,104],[540,52,120],[600,52,108],[720,52,108]]
+  ];
+  class RiverGame {
+    constructor(){this.reset('b');this.mode='title';}
+    reset(difficulty='b'){
+      this.difficulty=difficulty==='a'?'a':'b';this.mode='ready';this.previousMode='playing';
+      this.distance=0;this.x=80;this.speed=35;this.score=0;this.reserves=3;
+      this.fuel=100;this.level=1;this.bridges=0;this.nextLife=10000;
+      this.checkpoint=0;this.checkpointLevel=1;this.time=0;this.deathTimer=0;
+      this.cooldown=0;this.refueling=false;this.lowFuel=false;this.generated=-1;
+      this.entities=[];this.bullets=[];this.events=[];this.distanceBest=0;
+      this.ensureWorld();
+    }
+    get playerY(){return this.distance+PLAY-PY;}
+    screenY(y){return PLAY-y+this.distance;}
+    river(y){
+      if(y<0)return {left:36,right:124,center:80,width:88};
+      const stage=Math.floor(y/SECTOR), local=y-stage*SECTOR;
+      const route=ROUTES[stage%ROUTES.length];
+      let a=route[0],b=route[1];
+      for(let i=1;i<route.length;i++){a=route[i-1];b=route[i];if(local<=b[0])break;}
+      const t=clamp((local-a[0])/(b[0]-a[0]),0,1);
+      let left=a[1]+(b[1]-a[1])*t,right=a[2]+(b[2]-a[2])*t;
+      // The TIA playfield changes in coarse horizontal blocks.
+      left=Math.round(left/4)*4;right=Math.round(right/4)*4;
+      if(stage>=4&&local>120&&local<550){const shrink=Math.min(12,Math.floor(stage/4)*4);left+=shrink;right-=shrink;}
+      return {left,right,center:(left+right)/2,width:right-left};
+    }
+    ensureWorld(){
+      const last=Math.floor((this.distance+PLAY+100)/SECTOR);
+      while(this.generated<last)this.generate(++this.generated);
+    }
+    generate(stage){
+      const start=stage*SECTOR;
+      const add=(type,local,x,extra={})=>{
+        this.entities.push({id:stage+':'+type+':'+local,type,y:start+local,x,originX:x,dead:false,
+          phase:noise(stage*49+local)*6.28,direction:noise(stage*7+local)>.5?1:-1,...extra});
+      };
+      const positions=stage===0?[[112,61,'boat'],[250,105,'heli'],[352,63,'boat'],[470,107,'heli'],[580,72,'boat']]:
+        [[100,81,'heli'],[220,39,'boat'],[340,121,'heli'],[465,83,stage>1?'jet':'boat'],[575,77,'heli']];
+      positions.forEach(([y,x,type],i)=>{
+        const bank=this.river(start+y);
+        x=clamp(x,bank.left+10,bank.right-10);
+        add(type,y,x,{w:type==='boat'?16:type==='jet'?16:14,h:type==='boat'?9:9,
+          points:type==='boat'?30:type==='heli'?60:100,velocity:type==='jet'?38:type==='heli'?15:7,
+          moving:stage>0||i>2});
+      });
+      add('fuel',185,stage%2?106:77,{w:12,h:34,points:80});
+      if(stage<7||stage%3!==1){const bank=this.river(start+520);add('fuel',520,clamp(stage%2?58:92,bank.left+10,bank.right-10),{w:12,h:34,points:80});}
+      if(stage%4===1)add('island',270,80,{w:24,h:220});
+      if(stage%4===3)add('island',278,80,{w:40,h:240});
+      add('bridge',690,80,{w:56,h:10,points:500,stage:stage+1,passed:false});
+    }
+    emit(type,data={}){this.events.push({type,...data});}
+    takeEvents(){const e=this.events;this.events=[];return e;}
+    start(){if(this.mode==='ready'){this.mode='playing';this.emit('start');}}
+    pause(){if(['playing','dying','ready'].includes(this.mode)){this.previousMode=this.mode;this.mode='paused';this.emit('pause');}}
+    resume(){if(this.mode==='paused'){this.mode=this.previousMode;this.emit('resume');}}
+    addScore(points){
+      this.score+=points;
+      while(this.score>=this.nextLife){this.reserves=Math.min(9,this.reserves+1);this.nextLife+=10000;this.emit('extraLife');}
+    }
+    destroy(e){
+      if(e.dead||e.type==='island')return;
+      e.dead=true;this.addScore(e.points);
+      if(e.type==='bridge'){
+        this.bridges++;this.checkpoint=e.y+30-(PLAY-PY);this.checkpointLevel=e.stage+1;
+        this.emit('bridge');
+      }
+      this.emit('destroy',{x:e.x,y:e.y,kind:e.type,points:e.points});
+    }
+    crash(reason){
+      if(this.mode!=='playing')return;
+      this.mode='dying';this.deathTimer=1.15;this.refueling=false;
+      this.emit('death',{x:this.x,y:this.playerY,reason});
+    }
+    respawn(){
+      this.distance=this.checkpoint;this.level=this.checkpointLevel;
+      this.x=this.river(this.playerY).center;this.speed=35;this.fuel=100;
+      this.bullets=[];this.entities=[];this.generated=Math.floor(this.distance/SECTOR)-1;
+      this.ensureWorld();this.lowFuel=false;this.refueling=false;this.cooldown=0;
+      this.mode='ready';this.emit('respawn');
+    }
+    islandHalfWidth(e,y){return Math.ceil(e.w/2*clamp((e.h/2-Math.abs(y-e.y))/28,0,1)/4)*4;}
+    landAt(x,y,pad=0){
+      const bank=this.river(y);
+      if(x-pad<bank.left||x+pad>bank.right)return true;
+      return this.entities.some(e=>e.type==='island'&&Math.abs(y-e.y)<e.h/2&&Math.abs(x-e.x)<this.islandHalfWidth(e,y)+pad);
+    }
+    step(dt,input={}){
+      if(!Number.isFinite(dt)||dt<=0)return;dt=Math.min(dt,1/30);
+      if(this.mode==='dying'){
+        this.deathTimer-=dt;
+        if(this.deathTimer<=0){
+          if(this.reserves>0){this.reserves--;this.respawn();}
+          else{this.mode='gameover';this.emit('gameover');}
+        }return;
+      }
+      if(this.mode==='ready'&&(input.fire||input.move||input.throttle))this.start();
+      if(this.mode!=='playing')return;
+      this.time+=dt;
+      const move=clamp(Number(input.move)||0,-1,1),throttle=clamp(Number(input.throttle)||0,-1,1);
+      const target=throttle>0?57:throttle<0?18:35;
+      this.speed+=(target-this.speed)*Math.min(1,dt*6);
+      const oldX=this.x;this.x=clamp(this.x+move*58*dt,3,W-3);
+      this.distance+=this.speed*dt;this.distanceBest=Math.max(this.distanceBest,this.playerY);
+      this.level=Math.max(this.level,Math.floor(this.playerY/SECTOR)+1);this.ensureWorld();
+      this.cooldown-=dt;
+      if(input.fire&&this.bullets.length===0&&this.cooldown<=0){
+        this.bullets.push({x:this.x,y:this.playerY+7});this.cooldown=.09;this.emit('shot');
+      }
+      for(const e of this.entities){
+        if(e.dead||!e.moving||e.y<this.distance-20||e.y>this.distance+PLAY+20)continue;
+        const bank=this.river(e.y);
+        const step=e.direction*e.velocity*dt;
+        let next=e.x+step;
+        if(next<bank.left+e.w/2||next>bank.right-e.w/2||this.landAt(next,e.y,e.w/2)){
+          e.direction*=-1;next=e.x-step;
+        }
+        e.x=clamp(next,bank.left+e.w/2,bank.right-e.w/2);
+      }
+      for(const b of this.bullets){
+        const oldY=b.y;
+        if(this.difficulty==='b')b.x+=this.x-oldX;
+        b.y+=(155+this.speed)*dt;
+        let hit=null,nearest=Infinity;
+        for(const e of this.entities){
+          if(e.dead||e.type==='island'||e.y+e.h/2<oldY||e.y-e.h/2>b.y)continue;
+          if(Math.abs(e.x-b.x)<=e.w/2+.5&&e.y<nearest){hit=e;nearest=e.y;}
+        }
+        if(hit){this.destroy(hit);b.dead=true;}
+        if(this.landAt(b.x,b.y))b.dead=true;
+      }
+      this.bullets=this.bullets.filter(b=>!b.dead&&b.y<this.distance+PLAY+8);
+      const py=this.playerY;this.refueling=false;
+      this.fuel-=2.7*dt; // Original rule: time-based, independent of airspeed.
+      for(const e of this.entities){
+        if(e.dead)continue;
+        const dx=Math.abs(this.x-e.x),dy=Math.abs(py-e.y);
+        if(e.type==='fuel'){
+          if(dx<e.w/2+2&&dy<e.h/2+4){this.refueling=true;this.fuel=Math.min(100,this.fuel+58*dt);}
+        }else if(e.type!=='island'&&dx<e.w/2+2&&dy<e.h/2+4){this.crash(e.type);break;}
+      }
+      if(this.mode!=='playing')return;
+      if(this.landAt(this.x,py,3)||this.landAt(this.x,py+5,1))this.crash('bank');
+      if(this.mode!=='playing')return;
+      if(this.fuel<=0){this.fuel=0;this.crash('fuel');}
+      if(this.fuel<25&&!this.lowFuel){this.lowFuel=true;this.emit('lowFuel');}
+      if(this.fuel>30)this.lowFuel=false;
+      this.entities=this.entities.filter(e=>e.y+e.h>Math.min(this.checkpoint,this.distance)-100);
+    }
+  }
+  globalThis.RiverRaid={RiverGame,W,H,PLAY,PY,SECTOR,clamp,noise};
+})();
+</script>
+<script id="renderer">
+(() => {
+  'use strict';
+  const {W,H,PLAY,PY,noise}=RiverRaid;
+  const C={grass:'#6c982f',water:'#303bb7',yellow:'#e8d64a',hud:'#898989',white:'#eeeecc',road:'#adadad',dark:'#161b39',heli:'#1b4827'};
+  const FONT={
+    '0':['111','101','101','101','111'],'1':['010','110','010','010','111'],
+    '2':['111','001','111','100','111'],'3':['111','001','111','001','111'],
+    '4':['101','101','111','001','001'],'5':['111','100','111','001','111'],
+    '6':['111','100','111','101','111'],'7':['111','001','010','010','010'],
+    '8':['111','101','111','101','111'],'9':['111','101','111','001','111'],
+    'A':['010','101','111','101','101'],'B':['110','101','110','101','110'],
+    'C':['111','100','100','100','111'],'D':['110','101','101','101','110'],
+    'E':['111','100','110','100','111'],'F':['111','100','110','100','100'],
+    'G':['111','100','101','101','111'],'H':['101','101','111','101','101'],
+    'I':['111','010','010','010','111'],'J':['001','001','001','101','111'],
+    'K':['101','101','110','101','101'],'L':['100','100','100','100','111'],
+    'M':['10101','11111','10101','10101','10101'],'N':['1001','1101','1011','1001','1001'],
+    'O':['111','101','101','101','111'],'P':['111','101','111','100','100'],
+    'Q':['111','101','101','111','001'],'R':['110','101','110','101','101'],
+    'S':['111','100','111','001','111'],'T':['111','010','010','010','010'],
+    'U':['101','101','101','101','111'],'V':['101','101','101','101','010'],
+    'W':['10101','10101','10101','11111','01010'],'X':['101','101','010','101','101'],
+    'Y':['101','101','010','010','010'],'Z':['111','001','010','100','111'],
+    '/':['001','001','010','100','100'],'!':['1','1','1','0','1'],
+    '-':['000','000','111','000','000'],':':['0','1','0','1','0'],' ':['00','00','00','00','00']
+  };
+  const SPRITES={
+    player:['000010000','000010000','000111000','000111000','001111100','011111110','111111111','000111000','001111100'],
+    boat:['0000000110000000','0000001111000000','0001111111100000','0111111111111100','1111111111111111','0111111111111110','0011111111111100','0001111111110000'],
+    heli:['00000001000000','11111111111111','00000001000000','00000111100000','11111111111100','10001111111111','00000111100000','00000100100000','00011111110000'],
+    jet:['0001000000000000','0001100000000000','0001111000000000','1111111111111100','1111111111111111','0001111000000000','0001100000000000','0001000000000000']
+  };
+  class RiverRenderer{
+    constructor(canvas){this.canvas=canvas;this.ctx=canvas.getContext('2d',{alpha:false});this.ctx.imageSmoothingEnabled=false;this.effects=[];}
+    rect(x,y,w,h,color){this.ctx.fillStyle=color;this.ctx.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h));}
+    text(t,x,y,color=C.yellow,scale=1){
+      for(const ch of String(t).toUpperCase()){
+        const grid=FONT[ch]||FONT[' '];
+        grid.forEach((row,j)=>[...row].forEach((v,i)=>{if(v==='1')this.rect(x+i*scale,y+j*scale,scale,scale,color);}));
+        x+=(grid[0].length+1)*scale;
+      }
+    }
+    sprite(name,x,y,color,flip=false){
+      const rows=SPRITES[name];const width=rows[0].length;
+      rows.forEach((row,j)=>[...row].forEach((v,i)=>{if(v==='1')this.rect(x-width/2+(flip?width-1-i:i),y-rows.length/2+j,1,1,color);}));
+    }
+    event(e){if(e.type==='destroy'||e.type==='death')this.effects.push({x:e.x,y:e.y,t:0,death:e.type==='death'});}
+    draw(g,dt=0,player=1,now=0){
+      const ctx=this.ctx;
+      this.rect(0,0,W,H,C.grass);
+      for(let sy=0;sy<PLAY;sy++){
+        const bank=g.river(g.distance+PLAY-sy);
+        this.rect(bank.left,sy,bank.width,1,C.water);
+      }
+      ctx.save();ctx.beginPath();ctx.rect(0,0,W,PLAY);ctx.clip();
+      // Small houses on the bank, in the low-resolution language of the original.
+      const start=Math.floor(g.distance/170);
+      for(let i=start;i<start+3;i++){
+        const wy=i*170+70, sy=g.screenY(wy), side=i%2===0;
+        const bank=g.river(wy), x=side?bank.left-15:bank.right+7;
+        if(x<2||x>148)continue;
+        this.rect(x,sy,8,5,C.white);this.rect(x-1,sy-2,10,2,'#ad573e');
+        this.rect(x+3,sy+2,2,3,'#6c482c');
+      }
+      for(const e of g.entities){
+        const y=g.screenY(e.y);if(y+e.h/2<0||y-e.h/2>PLAY)continue;
+        if(e.type==='island'){
+          for(let j=-e.h/2;j<e.h/2;j++){
+            const half=Math.ceil(g.islandHalfWidth(e,e.y+j)/4)*4;
+            this.rect(e.x-half,y+j,half*2,1,C.grass);
+          }
+        }
+        if(e.type==='bridge'){
+          this.rect(0,y-5,W,10,C.road);this.rect(0,y-6,W,1,'#b65f32');this.rect(0,y+5,W,1,'#b65f32');
+          if(e.dead){const bank=g.river(e.y);this.rect(bank.left,y-6,bank.width,12,C.water);}
+          else{this.rect(e.x-e.w/2,y-5,e.w,10,'#a47336');this.rect(e.x-e.w/2,y-4,e.w,2,'#c19a59');
+            this.rect(e.x-e.w/2,y+2,e.w,2,'#c19a59');for(let x=0;x<W;x+=9)this.rect(x,y,4,1,C.white);}
+        }
+      }
+      for(const e of g.entities){
+        const y=g.screenY(e.y);if(e.dead||y+e.h/2<0||y-e.h/2>PLAY)continue;
+        if(e.type==='fuel'){
+          this.rect(e.x-6,y-17,12,34,'#cb454d');this.rect(e.x-5,y-15,10,30,C.white);
+          this.rect(e.x-5,y-15,3,30,'#c04455');
+          ['F','U','E','L'].forEach((ch,i)=>this.text(ch,e.x-1,y-14+i*7,'#cb454d'));
+        }else if(e.type==='boat'){
+          this.sprite('boat',e.x,y,'#141938',e.direction<0);this.rect(e.x-2,y-4,3,2,C.white);
+          this.rect(e.x-4,y-2,6,2,'#8e939f');
+        }else if(e.type==='heli'){
+          this.sprite('heli',e.x,y,C.heli,e.direction<0);
+          const rotor=Math.floor(now/80)%2?12:8;this.rect(e.x-rotor/2,y-3,rotor,1,C.heli);
+          this.rect(e.x+2*(e.direction<0?-1:1),y-1,2,2,'#719f74');
+        }else if(e.type==='jet')this.sprite('jet',e.x,y,C.white,e.direction<0);
+      }
+      for(const b of g.bullets)this.rect(b.x,g.screenY(b.y)-3,1,5,C.yellow);
+      if(!['dying','gameover'].includes(g.mode))this.sprite('player',g.x,PY,C.yellow);
+      this.effects=this.effects.filter(e=>e.t<.55);
+      for(const e of this.effects){
+        e.t+=dt;const r=3+e.t*13;
+        for(let k=0;k<22;k++){
+          const angle=k*2.399,dist=r*(.2+noise(k)*.8);
+          this.rect(e.x+Math.cos(angle)*dist,g.screenY(e.y)+Math.sin(angle)*dist,2,2,k%3===0?'#e47732':C.yellow);
+        }
+      }
+      ctx.restore();
+      this.rect(0,PLAY,W,H-PLAY,C.hud);
+      const score=g.score>=1000000?'!!!!!!':String(g.score).padStart(6,'0');
+      this.text(score,65,170,C.yellow,1);
+      this.text(player,28,170,C.yellow);
+      this.rect(49,181,63,17,C.white);this.rect(51,183,59,13,'#242424');
+      this.text('E',43,186,C.white);this.text('F',116,186,C.white);
+      this.text('1/2',74,184,C.white);
+      this.rect(55,193,1,3,C.white);this.rect(80,193,1,3,C.white);this.rect(105,193,1,3,C.white);
+      this.rect(55+g.fuel*.50,191,1,5,g.fuel<25?'#e4694b':C.yellow);
+      const reserveCount=Math.min(g.reserves,9);
+      for(let i=0;i<reserveCount;i++){
+        const x=8+i*4;this.rect(x+1,184,1,5,C.yellow);this.rect(x,186,3,1,C.yellow);this.rect(x,188,3,1,C.yellow);
+      }
+      this.text('ACTIVISION',60,202,'#343434');
+    }
+  }
+  globalThis.RiverRenderer=RiverRenderer;
+})();
+</script>
+<script id="app">
+(() => {
+  'use strict';
+  const $=id=>document.getElementById(id);
+  const renderer=new RiverRenderer($('screen'));
+  const keys=new Set(),touch=new Map();
+  let games=[new RiverRaid.RiverGame()],active=0,g=games[0];
+  let best=0,soundOn=true,started=false,lastMode='',previousTime=0,accumulator=0;
+  let audio=null,osc=null,engineGain=null,lastFuelTone=0,lastWarning=0;
+  let gamepadPause=false,gamepadStart=false;
+  const read=(k,fallback)=>{try{return localStorage.getItem(k)??fallback;}catch{return fallback;}};
+  const save=(k,v)=>{try{localStorage.setItem(k,String(v));}catch{/* Private browsers can block storage. */}};
+  soundOn=read('riverraid-sound','on')==='on';
+  function getBest(){const value=Number(read('riverraid-best-'+$('difficulty').value,'0'));best=Number.isFinite(value)?Math.max(0,value):0;}
+  function soundInit(){
+    if(!soundOn)return;
+    try{
+      if(!audio){
+        const Audio=window.AudioContext||window.webkitAudioContext;
+        if(!Audio)return;
+        audio=new Audio();osc=audio.createOscillator();engineGain=audio.createGain();
+        osc.type='sawtooth';osc.frequency.value=48;engineGain.gain.value=0;
+        osc.connect(engineGain);engineGain.connect(audio.destination);osc.start();
+      }
+      if(audio.state==='suspended')audio.resume().catch(()=>{});
+    }catch{/* Sound is optional; gameplay must remain available. */}
+  }
+  function tone(freq,duration=.08,type='square',volume=.04,end=freq){
+    if(!audio||!soundOn||audio.state!=='running')return;
+    const o=audio.createOscillator(),v=audio.createGain(),t=audio.currentTime;
+    o.type=type;o.frequency.setValueAtTime(freq,t);o.frequency.exponentialRampToValueAtTime(Math.max(15,end),t+duration);
+    v.gain.setValueAtTime(volume,t);v.gain.exponentialRampToValueAtTime(.001,t+duration);
+    o.connect(v);v.connect(audio.destination);o.start(t);o.stop(t+duration+.02);
+    o.onended=()=>{o.disconnect();v.disconnect();};
+  }
+  function soundStep(now){
+    if(!audio)return;
+    const flying=g.mode==='playing'&&soundOn;
+    engineGain.gain.setTargetAtTime(flying?.017:0,audio.currentTime,.04);
+    osc.frequency.setTargetAtTime(35+g.speed*.8,audio.currentTime,.08);
+    if(flying&&g.refueling&&now-lastFuelTone>160){tone(g.fuel>98?1120:740,.07,'square',.035);lastFuelTone=now;}
+    if(flying&&g.fuel<25&&!g.refueling&&now-lastWarning>650){tone(360,.25,'triangle',.09,610);lastWarning=now;}
+  }
+  function announce(message){$('announcement').textContent=message;}
+  function clearInput(){keys.clear();touch.clear();document.querySelectorAll('[data-control]').forEach(b=>b.classList.remove('held'));}
+  function input(){
+    const down=name=>[...touch.values()].includes(name);
+    let move=(keys.has('ArrowRight')||keys.has('KeyD')||down('right')?1:0)-(keys.has('ArrowLeft')||keys.has('KeyA')||down('left')?1:0);
+    let throttle=(keys.has('ArrowUp')||keys.has('KeyW')||down('up')?1:0)-(keys.has('ArrowDown')||keys.has('KeyS')||down('down')?1:0);
+    let fire=keys.has('Space')||keys.has('KeyZ')||down('fire');
+    const pads=navigator.getGamepads?navigator.getGamepads():[];
+    const pad=pads[active]||pads[0];
+    if(pad){
+      const axis=Number(pad.axes[0])||0,vertical=Number(pad.axes[1])||0;
+      const padX=(pad.buttons[15]?.pressed?1:0)-(pad.buttons[14]?.pressed?1:0);
+      const padY=(pad.buttons[12]?.pressed?1:0)-(pad.buttons[13]?.pressed?1:0);
+      if(Math.abs(axis)>.25)move=axis;else if(padX)move=padX;
+      if(Math.abs(vertical)>.25)throttle=-vertical;else if(padY)throttle=padY;
+      fire=fire||!!pad.buttons[0]?.pressed;
+      const pause=!!pad.buttons[9]?.pressed;
+      if(pause&&!gamepadPause){if(!started)prepare();else togglePause();}gamepadPause=pause;
+      if(fire&&!gamepadStart&&!started)prepare();gamepadStart=fire;
+    }
+    return {move,throttle,fire};
+  }
+  function prepare(){
+    clearInput();soundInit();getBest();active=0;
+    games=Array.from({length:Number($('players').value)},()=>new RiverRaid.RiverGame());
+    games.forEach(game=>game.reset($('difficulty').value));g=games[0];
+    started=true;renderer.effects=[];lastMode='';accumulator=0;
+    announce('Jogador 1. Pressione uma seta ou o botão de tiro para decolar.');
+    sync();$('screen').focus({preventScroll:true});
+  }
+  function switchPlayer(){
+    if(games.length<2)return;
+    const other=1-active;
+    if(games[other].mode==='gameover')return;
+    active=other;g=games[active];clearInput();renderer.effects=[];lastMode='';
+    announce('Vez do jogador '+(active+1)+'. Pressione uma seta ou atire para decolar.');
+  }
+  function togglePause(){
+    if(g.mode==='paused'){g.resume();soundInit();}
+    else g.pause();clearInput();sync();$('screen').focus({preventScroll:true});
+  }
+  function toggleSound(){
+    soundOn=!soundOn;save('riverraid-sound',soundOn?'on':'off');
+    if(soundOn)soundInit();sync();
+  }
+  async function fullscreen(){
+    try{
+      if(document.fullscreenElement)await document.exitFullscreen();
+      else if($('console').requestFullscreen)await $('console').requestFullscreen();
+      else announce('Use o modo de tela cheia do seu navegador.');
+    }catch{announce('O navegador não permitiu tela cheia.');}
+  }
+  function processEvents(){
+    const events=g.takeEvents();let alternate=false;
+    for(const e of events){
+      renderer.event(e);
+      if(e.type==='shot')tone(850,.07,'sawtooth',.03,190);
+      if(e.type==='destroy')tone(e.kind==='bridge'?95:160,.18,'sawtooth',.07,28);
+      if(e.type==='death')tone(160,.65,'sawtooth',.09,20);
+      if(e.type==='extraLife'){tone(1000,.22,'square',.05,1500);announce('Avião de reserva extra.');}
+      if(e.type==='lowFuel')announce('Combustível baixo. Sobrevoe um depósito de combustível.');
+      if(e.type==='respawn'||e.type==='gameover')alternate=true;
+    }
+    if(g.score>best){best=g.score;save('riverraid-best-'+g.difficulty,best);}
+    if(alternate)switchPlayer();
+  }
+  function sync(){
+    $('record').textContent=String(best).padStart(6,'0');
+    $('sound').textContent=soundOn?'SOM: ON':'SOM: OFF';$('sound').setAttribute('aria-pressed',String(soundOn));
+    const paused=g.mode==='paused';
+    $('pause').textContent=paused?'CONTINUAR':'PAUSAR';$('pause').disabled=!started||g.mode==='gameover';
+    $('reset').textContent=started?'REINICIAR':'INICIAR';
+    const canSelect=!started||games.every(game=>game.mode==='gameover');
+    $('difficulty').disabled=!canSelect;$('players').disabled=!canSelect;
+    $('turn').textContent=games.length===2?'JOGADOR '+(active+1):'1 JOGADOR';
+    let message='ENTER OU INICIAR PARA JOGAR';
+    if(g.mode==='playing')message=g.refueling?'REABASTECENDO':g.fuel<25?'COMBUSTÍVEL BAIXO':'SETAS: VOAR  /  ESPAÇO: ATIRAR';
+    if(g.mode==='ready')message='JOGADOR '+(active+1)+' · SETA OU TIRO PARA DECOLAR';
+    if(g.mode==='paused')message='PAUSADO · P PARA CONTINUAR';
+    if(g.mode==='dying')message=g.reserves>0?'PREPARE O PRÓXIMO AVIÃO':'FIM DE JOGO';
+    if(g.mode==='gameover')message='FIM DE JOGO · ENTER PARA REINICIAR';
+    $('status').textContent=message;
+    const ended=started&&games.every(game=>game.mode==='gameover');
+    $('overlay').hidden=!(paused||ended);
+    if(paused){$('overlayTitle').textContent='PAUSADO';$('overlayText').textContent='Seu voo continua de onde parou.';$('continue').textContent='CONTINUAR';}
+    if(ended){$('overlayTitle').textContent='FIM DE JOGO';$('overlayText').textContent=games.map((game,i)=>'Jogador '+(i+1)+': '+game.score.toLocaleString('pt-BR')+' pontos').join(' · ');$('continue').textContent='JOGAR NOVAMENTE';}
+    if(g.mode!==lastMode){
+      if(ended)announce($('overlayText').textContent+'. Fim de jogo.');
+      lastMode=g.mode;
+    }
+  }
+  function showHelp(){g.pause();clearInput();sync();$('helpDialog').showModal();}
+  $('reset').addEventListener('click',prepare);
+  $('pause').addEventListener('click',togglePause);
+  $('continue').addEventListener('click',()=>{if(g.mode==='paused')togglePause();else prepare();});
+  $('sound').addEventListener('click',toggleSound);
+  $('fullscreen').addEventListener('click',fullscreen);
+  $('help').addEventListener('click',showHelp);
+  $('closeHelp').addEventListener('click',()=>$('helpDialog').close());
+  $('difficulty').addEventListener('change',()=>{g.difficulty=$('difficulty').value;getBest();sync();});
+  $('players').addEventListener('change',()=>{$('turn').textContent=$('players').value+' JOGADOR'+($('players').value==='2'?'ES':'');});
+  document.addEventListener('keydown',e=>{
+    if(e.target instanceof HTMLSelectElement||e.target instanceof HTMLInputElement||$('helpDialog').open)return;
+    // Leave Enter/Space activation to focused native buttons (avoid double actions).
+    if(e.target instanceof HTMLButtonElement&&(e.code==='Enter'||e.code==='Space'))return;
+    const codes=['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','KeyA','KeyD','KeyW','KeyS','Space','KeyZ','Enter','KeyP','Escape','KeyM','KeyF'];
+    if(!codes.includes(e.code))return;e.preventDefault();
+    if(!e.repeat){
+      if(e.code==='Enter'){prepare();return;}
+      if(e.code==='KeyP'||e.code==='Escape'){togglePause();return;}
+      if(e.code==='KeyM'){toggleSound();return;}
+      if(e.code==='KeyF'){fullscreen();return;}
+      if(!started&&e.code==='Space')prepare();
+    }
+    keys.add(e.code);soundInit();
+  });
+  document.addEventListener('keyup',e=>keys.delete(e.code));
+  document.querySelectorAll('[data-control]').forEach(button=>{
+    button.addEventListener('pointerdown',e=>{
+      e.preventDefault();if(!started)prepare();soundInit();
+      button.setPointerCapture(e.pointerId);touch.set(e.pointerId,button.dataset.control);button.classList.add('held');
+    });
+    const release=e=>{touch.delete(e.pointerId);if(![...touch.values()].includes(button.dataset.control))button.classList.remove('held');};
+    ['pointerup','pointercancel','lostpointercapture'].forEach(name=>button.addEventListener(name,release));
+  });
+  window.addEventListener('blur',()=>{clearInput();g.pause();sync();});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden){clearInput();g.pause();sync();}});
+  document.addEventListener('fullscreenchange',()=>{$('fullscreen').textContent=document.fullscreenElement?'SAIR DA TELA CHEIA':'TELA CHEIA';});
+  let lastSync=0;
+  function frame(now){
+    const elapsed=previousTime?Math.min((now-previousTime)/1000,.1):0;previousTime=now;
+    const controls=input();accumulator+=elapsed;
+    while(accumulator>=1/60){g.step(1/60,controls);processEvents();accumulator-=1/60;}
+    renderer.draw(g,g.mode==='paused'?0:elapsed,active+1,now);soundStep(now);
+    if(now-lastSync>90||g.mode!==lastMode){sync();lastSync=now;}
+    requestAnimationFrame(frame);
+  }
+  getBest();sync();requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
